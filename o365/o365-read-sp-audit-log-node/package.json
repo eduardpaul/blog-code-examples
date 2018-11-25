@@ -1,0 +1,16 @@
+{
+  "name": "access-sp-audit-data",
+  "version": "1.0.0",
+  "description": "",
+  "main": "access_audit_data.js",
+  "dependencies": {
+    "adal-node": "0.1.28",
+    "node-fetch": "2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node access_audit_data.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
