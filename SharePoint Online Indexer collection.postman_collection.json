@@ -1,0 +1,246 @@
+{
+	"info": {
+		"_postman_id": "91568ba0-4bef-4661-99c6-3530273b8985",
+		"name": "SharePoint Online Indexer collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7359181"
+	},
+	"item": [
+		{
+			"name": "Step 4: Create data source - delegated",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"sharepoint-datasource\",\r\n    \"type\" : \"sharepoint\",\r\n    \"credentials\" : { \"connectionString\" : \"SharePointOnlineEndpoint=https://xxxx.sharepoint.com/sites/productsupport/;ApplicationId=b4772104-621a-4aa3-ba14-xxxx;TenantId=3963ea86-5f68-44d4-bf00-xxxx\" },\r\n    \"container\" : { \"name\" : \"defaultSiteLibrary\", \"query\" : null }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{srchServiceName}}.search.windows.net/datasources?api-version=2024-05-01-preview",
+					"protocol": "https",
+					"host": [
+						"{{srchServiceName}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"datasources"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2024-05-01-preview"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5: Create an index - delegated",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"sharepoint-index\",\r\n    \"fields\": [\r\n        { \"name\": \"id\", \"type\": \"Edm.String\", \"key\": true, \"searchable\": false },\r\n        { \"name\": \"metadata_spo_item_name\", \"type\": \"Edm.String\", \"key\": false, \"searchable\": true, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"metadata_spo_item_path\", \"type\": \"Edm.String\", \"key\": false, \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"metadata_spo_item_content_type\", \"type\": \"Edm.String\", \"key\": false, \"searchable\": false, \"filterable\": true, \"sortable\": false, \"facetable\": true },\r\n        { \"name\": \"metadata_spo_item_last_modified\", \"type\": \"Edm.DateTimeOffset\", \"key\": false, \"searchable\": false, \"filterable\": false, \"sortable\": true, \"facetable\": false },\r\n        { \"name\": \"metadata_spo_item_size\", \"type\": \"Edm.Int64\", \"key\": false, \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"content\", \"type\": \"Edm.String\", \"searchable\": true, \"filterable\": false, \"sortable\": false, \"facetable\": false }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{srchServiceName}}.search.windows.net/indexes?api-version=2024-05-01-preview",
+					"protocol": "https",
+					"host": [
+						"{{srchServiceName}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexes"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2024-05-01-preview"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 6: Create an indexer - delegated",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"sharepoint-indexer\",\r\n    \"dataSourceName\" : \"sharepoint-datasource\",\r\n    \"targetIndexName\" : \"sharepoint-index\",\r\n    \"parameters\": {\r\n    \"batchSize\": null,\r\n    \"maxFailedItems\": null,\r\n    \"maxFailedItemsPerBatch\": null,\r\n    \"base64EncodeKeys\": null,\r\n    \"configuration\": {\r\n        \"indexedFileNameExtensions\" : \".docx\",\r\n        \"excludedFileNameExtensions\" : \".png, .jpg\",\r\n        \"dataToExtract\": \"contentAndMetadata\"\r\n      }\r\n    },\r\n    \"schedule\" : { },\r\n    \"fieldMappings\" : [\r\n        { \r\n          \"sourceFieldName\" : \"metadata_spo_site_library_item_id\", \r\n          \"targetFieldName\" : \"id\", \r\n          \"mappingFunction\" : { \r\n            \"name\" : \"base64Encode\" \r\n          } \r\n         }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{srchServiceName}}.search.windows.net/indexers?api-version=2024-05-01-preview",
+					"protocol": "https",
+					"host": [
+						"{{srchServiceName}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2024-05-01-preview"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 6.1: Get indexer status - delegated",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"sharepoint-indexer\",\r\n    \"dataSourceName\" : \"sharepoint-datasource\",\r\n    \"targetIndexName\" : \"sharepoint-index\",\r\n    \"parameters\": {\r\n    \"batchSize\": null,\r\n    \"maxFailedItems\": null,\r\n    \"maxFailedItemsPerBatch\": null,\r\n    \"base64EncodeKeys\": null,\r\n    \"configuration\": {\r\n        \"indexedFileNameExtensions\" : \".docx\",\r\n        \"excludedFileNameExtensions\" : \".png, .jpg\",\r\n        \"dataToExtract\": \"contentAndMetadata\"\r\n      }\r\n    },\r\n    \"schedule\" : { },\r\n    \"fieldMappings\" : [\r\n        { \r\n          \"sourceFieldName\" : \"metadata_spo_site_library_item_id\", \r\n          \"targetFieldName\" : \"id\", \r\n          \"mappingFunction\" : { \r\n            \"name\" : \"base64Encode\" \r\n          } \r\n         }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{srchServiceName}}.search.windows.net/indexers/sharepoint-indexer/status?api-version=2024-05-01-preview",
+					"protocol": "https",
+					"host": [
+						"{{srchServiceName}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers",
+						"sharepoint-indexer",
+						"status"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2024-05-01-preview"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 7: Run indexer - delegated",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{srchServiceName}}.search.windows.net/indexers/sharepoint-indexer/run?api-version=2024-05-01-preview",
+					"protocol": "https",
+					"host": [
+						"{{srchServiceName}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers",
+						"sharepoint-indexer",
+						"run"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2024-05-01-preview"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{srchAdminKey}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "api-key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "srchServiceName",
+			"value": "searchsrv",
+			"type": "string"
+		},
+		{
+			"key": "srchAdminKey",
+			"value": "api key",
+			"type": "string"
+		}
+	]
+}
